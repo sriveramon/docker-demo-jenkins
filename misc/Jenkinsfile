@@ -11,20 +11,9 @@ node {
        sh 'npm test'
      }
    }
-   stage('Building image') {
-      steps{
-        script {
-          dockerImage = docker.build "sriveram/docker-demo-jenkins" + ":$BUILD_NUMBER"
-        }
-      }
-    }
-    stage('Deploy Image') {
-      steps{
-        script {
-          docker.withRegistry( '', 'dockerhub' ) {
-            dockerImage.push()
-          }
-        }
-      }
-    }
+   stage('docker build/push') {
+     docker.withRegistry('', 'dockerhub') {
+       def app = docker.build("sriveram/docker-demo-jenkins:${commit_id}", '.').push()
+     }
+   }
 }
